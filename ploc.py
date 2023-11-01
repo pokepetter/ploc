@@ -1,11 +1,19 @@
 from pathlib import Path
 from operator import itemgetter
-
+import sys
 
 total_lines = 0
 line_counts = []
 
-for path in Path.cwd().glob('**/*.py'):
+glob_pattern = '**/*.py'
+if len(sys.argv) > 1:
+    glob_pattern = sys.argv[1]
+
+comment_symbol = '#'
+if glob_pattern.endswith('.cs'):
+    comment_symbol = '//'
+
+for path in Path.cwd().glob(glob_pattern):
     if not path.is_file():
         continue
 
@@ -16,7 +24,7 @@ for path in Path.cwd().glob('**/*.py'):
     with path.open('r', encoding='utf-8') as f:
         lines = f.readlines()
         total_lines += len(lines)
-        source_lines_of_code = [l for l in lines if l!='\n' and not l.lstrip().startswith('#')]
+        source_lines_of_code = [l for l in lines if l!='\n' and not l.lstrip().startswith(comment_symbol)]
 
         line_counts.append((len(lines), str(relative_path), len(source_lines_of_code)))
 
